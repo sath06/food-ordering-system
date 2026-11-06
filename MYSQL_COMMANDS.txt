@@ -1,0 +1,87 @@
+SATHVIKA'S RESTAURANT — MYSQL WORKBENCH COMMANDS
+
+1) Create database and select it
+CREATE DATABASE IF NOT EXISTS food_ordering;
+USE food_ordering;
+
+2) Create menu table
+CREATE TABLE IF NOT EXISTS food_items (
+  food_id INT AUTO_INCREMENT PRIMARY KEY,
+  food_name VARCHAR(120) NOT NULL,
+  category VARCHAR(60) NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  description TEXT,
+  availability TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+3) Create order tables
+CREATE TABLE IF NOT EXISTS orders (
+  order_id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_name VARCHAR(120) NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  delivery_address TEXT NOT NULL,
+  payment_method VARCHAR(40) NOT NULL,
+  total_amount DECIMAL(10,2) NOT NULL,
+  order_status VARCHAR(30) NOT NULL DEFAULT 'Placed',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS order_items (
+  order_item_id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  food_id INT NULL,
+  food_name VARCHAR(120) NOT NULL,
+  unit_price DECIMAL(10,2) NOT NULL,
+  quantity INT NOT NULL,
+  subtotal DECIMAL(10,2) NOT NULL,
+  FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+  FOREIGN KEY (food_id) REFERENCES food_items(food_id) ON DELETE SET NULL
+);
+
+4) Insert sample menu rows
+INSERT INTO food_items (food_name,category,price,description,availability) VALUES
+('Classic Burger','Fast Food',149.00,'Juicy burger with fresh vegetables and sauce',1),
+('Margherita Pizza','Pizza',249.00,'Cheesy pizza with tomato and basil',1),
+('Veg Biryani','Indian',179.00,'Aromatic rice cooked with vegetables and spices',1),
+('French Fries','Snacks',89.00,'Crispy golden potato fries',1),
+('Chocolate Brownie','Dessert',99.00,'Rich chocolate brownie',1);
+
+5) View all records / table structure
+SHOW DATABASES;
+SHOW TABLES;
+DESCRIBE food_items;
+SELECT * FROM food_items;
+SELECT * FROM orders;
+SELECT * FROM order_items;
+
+6) Insert one new food item
+INSERT INTO food_items (food_name,category,price,description,availability)
+VALUES ('Paneer Butter Masala','Indian',220.00,'Creamy paneer curry',1);
+
+7) Update an existing food item (replace 1 with the required food_id)
+UPDATE food_items SET price=199.00 WHERE food_id=1;
+UPDATE food_items SET food_name='Special Veg Biryani', category='Indian', price=199.00,
+ description='Basmati rice with vegetables', availability=1 WHERE food_id=1;
+
+8) Alter table structure (DDL)
+ALTER TABLE food_items ADD COLUMN image_url VARCHAR(500) NULL;
+ALTER TABLE food_items MODIFY food_name VARCHAR(150) NOT NULL;
+ALTER TABLE food_items DROP COLUMN image_url;
+
+9) Delete a record (be careful; this is permanent)
+DELETE FROM food_items WHERE food_id=6;
+
+10) Useful filters and counts
+SELECT * FROM food_items WHERE availability=1;
+SELECT * FROM food_items WHERE category='Indian';
+SELECT COUNT(*) AS total_food_items FROM food_items;
+SELECT SUM(total_amount) AS total_order_value FROM orders;
+
+11) If you need to reset demo tables (DESTRUCTIVE — removes records)
+-- Do not run unless you intentionally want to delete all orders and menu rows.
+-- DELETE FROM order_items;
+-- DELETE FROM orders;
+-- DELETE FROM food_items;
+
+NOTE: Run database.sql once for the recommended complete setup. Avoid running the sample INSERT block repeatedly, or duplicate sample rows may be added. The website's Add/Edit/Delete screens execute INSERT/UPDATE/DELETE queries automatically; refresh Workbench and run SELECT * FROM food_items; to see the saved changes.
